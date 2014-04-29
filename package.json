@@ -1,0 +1,33 @@
+{
+  "author": "Marco Murdocca (marco.murdocca@xenialab.it)",
+  "name": "json-lzw",
+  "description": "JSON compression algorithm",
+  "version": "0.1.3",
+  "repository": {
+  	"type" : "git",
+    	"url": "https://github.com/hormander/json-lzw"
+  },
+  "main": "./lib/json-lzw.js",
+  "keywords": [
+    "lzw",
+    "Lempel",
+    "Ziv",
+    "Welch",
+    "AngularJS",
+    "json",
+    "jsonpack",
+    "compression"
+  ],
+  "bin": {
+    "json-lzw": "./lib/json-lzw.js"
+  },
+  "dependencies": {
+    "jsonpack": "*",
+    "node-lzw": "*"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "license": "GPL",
+  "homepage": "https://github.com/hormander/json-lzw"
+}
