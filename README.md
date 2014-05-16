@@ -39,7 +39,7 @@ decoding string value and return json string
 
 ## AngularJS integration
 
-Under node-lzw-install-path/angular there is jsonlzw.js, port of this library for AngularJS.
+Under json-lzw-install-path/angular there is jsonlzw.js, port of this library for AngularJS.
 Follow example of use.
 
 In your html file put
