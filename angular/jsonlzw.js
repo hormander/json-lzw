@@ -1,11 +1,16 @@
-angular.module('jsonlzw', []).
-  value('jsonlzw', {
-		TOKEN_TRUE: -1,
-		TOKEN_FALSE: -2,
-		TOKEN_NULL: -3,
-		TOKEN_EMPTY_STRING: -4,
+(function(angular) {
+    'use strict';
 
-		decode: function(s) {
+	angular.module('jsonlzw', [])
+	.factory('jsonlzw', jsonlzw);
+
+	function jsonlzw() {
+		var TOKEN_TRUE = -1;
+		var TOKEN_FALSE = -2;
+		var TOKEN_NULL = -3;
+		var TOKEN_EMPTY_STRING = -4;
+
+		var decode = function(s) {
 			var dict = {};
 			var data = (s + "").split("");
 			var currChar = data[0];
@@ -28,10 +33,10 @@ angular.module('jsonlzw', []).
 				oldPhrase = phrase;
 			}
 			var t = out.join("");
-			return this.unpack(t);
-		},
+			return unpack(t);
+		};
 		
-		encode: function(s) {
+		var encode = function(s) {
 			var dict = {};
 			var data = (s + "").split("");
 			var currChar = data[0];
@@ -49,10 +54,10 @@ angular.module('jsonlzw', []).
 				oldPhrase = phrase;
 			}
 			var t = out.join("");
-			return this.pack(t);			
-		},
+			return pack(t);			
+		};
 
-		pack: function(json, options) {
+		var pack = function(json, options) {
 
 			// Canonizes the options
 			options = options || {};
@@ -61,7 +66,7 @@ angular.module('jsonlzw', []).
 			var verbose = options.verbose || false;
 
 			// JSON as Javascript Object (Not string representation)
-			json = typeof json === 'string' ? this.JSON.parse(json) : json;
+			json = typeof json === 'string' ? JSON.parse(json) : json;
 
 			// The dictionary
 			var dictionary = {
@@ -80,7 +85,7 @@ angular.module('jsonlzw', []).
 				if (item === null) {
 					return {
 						type : 'null',
-						index : this.TOKEN_NULL
+						index : TOKEN_NULL
 					};
 				}
 
@@ -123,7 +128,7 @@ angular.module('jsonlzw', []).
 				if (item === '') {
 					return {
 						type : 'empty',
-						index : this.TOKEN_EMPTY_STRING
+						index : TOKEN_EMPTY_STRING
 					};
 				}
 
@@ -131,11 +136,11 @@ angular.module('jsonlzw', []).
 				if (type === 'string') {
 
 					// The index of that word in the dictionary
-					var index = this._indexOf.call(dictionary.strings, item);
+					var index = _indexOf.call(dictionary.strings, item);
 
 					// If not, add to the dictionary and actualize the index
 					if (index == -1) {
-						dictionary.strings.push(this._encode(item));
+						dictionary.strings.push(_encode(item));
 						index = dictionary.strings.length - 1;
 					}
 
@@ -150,11 +155,11 @@ angular.module('jsonlzw', []).
 				if (type === 'number' && item % 1 === 0) {
 
 					// The index of that number in the dictionary
-					var index = this._indexOf.call(dictionary.integers, item);
+					var index = _indexOf.call(dictionary.integers, item);
 
 					// If not, add to the dictionary and actualize the index
 					if (index == -1) {
-						dictionary.integers.push(this._base10To36(item));
+						dictionary.integers.push(_base10To36(item));
 						index = dictionary.integers.length - 1;
 					}
 
@@ -168,7 +173,7 @@ angular.module('jsonlzw', []).
 				// Case 6: The item is float
 				if (type === 'number') {
 					// The index of that number in the dictionary
-					var index = this._indexOf.call(dictionary.floats, item);
+					var index = _indexOf.call(dictionary.floats, item);
 
 					// If not, add to the dictionary and actualize the index
 					if (index == -1) {
@@ -188,7 +193,7 @@ angular.module('jsonlzw', []).
 				if (type === 'boolean') {
 					return {
 						type : 'boolean',
-						index : item ? this.TOKEN_TRUE : this.TOKEN_FALSE
+						index : item ? TOKEN_TRUE : TOKEN_FALSE
 					};
 				}
 
@@ -230,17 +235,17 @@ angular.module('jsonlzw', []).
 
 				if (type === 'strings') {
 					// Just return the base 36 of index
-					return this._base10To36(index);
+					return _base10To36(index);
 				}
 
 				if (type === 'integers') {
 					// Return a base 36 of index plus stringLength offset
-					return this._base10To36(stringLength + index);
+					return _base10To36(stringLength + index);
 				}
 
 				if (type === 'floats') {
 					// Return a base 36 of index plus stringLength and integerLength offset
-					return this._base10To36(stringLength + integerLength + index);
+					return _base10To36(stringLength + integerLength + index);
 				}
 
 				if (type === 'boolean') {
@@ -248,11 +253,11 @@ angular.module('jsonlzw', []).
 				}
 
 				if (type === 'null') {
-					return this.TOKEN_NULL;
+					return TOKEN_NULL;
 				}
 
 				if (type === 'empty') {
-					return this.TOKEN_EMPTY_STRING;
+					return TOKEN_EMPTY_STRING;
 				}
 
 				throw new TypeError('The item is alien!');
@@ -269,9 +274,9 @@ angular.module('jsonlzw', []).
 
 			return packed;
 
-		},
+		};
 
-		unpack: function(packed, options) {
+		var unpack = function(packed, options) {
 
 			// Canonizes the options
 			options = options || {};
@@ -287,7 +292,7 @@ angular.module('jsonlzw', []).
 			if (buffer !== '') {
 				buffer = buffer.split('|');
 				for (var i in buffer) {
-					dictionary.push(this._decode(buffer[i]));
+					dictionary.push(_decode(buffer[i]));
 				}
 			}
 
@@ -296,7 +301,7 @@ angular.module('jsonlzw', []).
 			if (buffer !== '') {
 				buffer = buffer.split('|');
 				for (var i in buffer) {
-					dictionary.push(this._base36To10(buffer[i]));
+					dictionary.push(_base36To10(buffer[i]));
 				}
 			}
 
@@ -309,7 +314,7 @@ angular.module('jsonlzw', []).
 				}
 			}
 			// Free memory
-			delete buffer;
+			// delete buffer;
 
 			// Tokenizer the structure
 			var number36 = '';
@@ -318,7 +323,7 @@ angular.module('jsonlzw', []).
 				var symbol = rawBuffers[3][i];
 				if (symbol === '|' || symbol === '$' || symbol === '@' || symbol === ']') {
 					if (number36) {
-						tokens.push(this._base36To10(number36));
+						tokens.push(_base36To10(number36));
 						number36 = '';
 					}
 					symbol !== '|' && tokens.push(symbol);
@@ -332,6 +337,7 @@ angular.module('jsonlzw', []).
 
 			// The index of the next token to read
 			var tokensIndex = 0;
+
 
 			return (function recursiveUnpackerParser() {
 
@@ -352,16 +358,16 @@ angular.module('jsonlzw', []).
 							node.push(recursiveUnpackerParser());
 						} else {
 							switch(value) {
-								case this.TOKEN_TRUE:
+								case TOKEN_TRUE:
 									node.push(true);
 									break;
-								case this.TOKEN_FALSE:
+								case TOKEN_FALSE:
 									node.push(false);
 									break;
-								case this.TOKEN_NULL:
+								case TOKEN_NULL:
 									node.push(null);
 									break;
-								case this.TOKEN_EMPTY_STRING:
+								case TOKEN_EMPTY_STRING:
 									node.push('');
 									break;
 								default:
@@ -386,7 +392,7 @@ angular.module('jsonlzw', []).
 						if (key === ']')
 							return node;
 
-						if (key === this.TOKEN_EMPTY_STRING)
+						if (key === TOKEN_EMPTY_STRING)
 							key = '';
 						else
 							key = dictionary[key];
@@ -397,16 +403,16 @@ angular.module('jsonlzw', []).
 							node[key] = recursiveUnpackerParser();
 						} else {
 							switch(value) {
-								case this.TOKEN_TRUE:
+								case TOKEN_TRUE:
 									node[key] = true;
 									break;
-								case this.TOKEN_FALSE:
+								case TOKEN_FALSE:
 									node[key] = false;
 									break;
-								case this.TOKEN_NULL:
+								case TOKEN_NULL:
 									node[key] = null;
 									break;
-								case this.TOKEN_EMPTY_STRING:
+								case TOKEN_EMPTY_STRING:
 									node[key] = '';
 									break;
 								default:
@@ -424,28 +430,28 @@ angular.module('jsonlzw', []).
 
 			})();
 
-		},
+		};
 		
-		_indexOfDictionary: function(dictionary, value) {
+		var _indexOfDictionary = function(dictionary, value) {
 
 			// The type of the value
 			var type = typeof value;
 
 			// If is boolean, return a boolean token
 			if (type === 'boolean')
-				return value ? this.TOKEN_TRUE : this.TOKEN_FALSE;
+				return value ? TOKEN_TRUE : TOKEN_FALSE;
 
 			// If is null, return a... yes! the null token
 			if (value === null)
-				return this.TOKEN_NULL;
+				return TOKEN_NULL;
 
 			if (value === '') {
-				return this.TOKEN_EMPTY_STRING;
+				return TOKEN_EMPTY_STRING;
 			}
 
 			if (type === 'string') {
-				value = this._encode(value);
-				var index = this._indexOf.call(dictionary.strings, value);
+				value = _encode(value);
+				var index = _indexOf.call(dictionary.strings, value);
 				if (index === -1) {
 					dictionary.strings.push(value);
 					index = dictionary.strings.length - 1;
@@ -458,18 +464,18 @@ angular.module('jsonlzw', []).
 			};
 
 			if (type === 'string') {// string
-				value = this._encode(value);
+				value = _encode(value);
 			} else if (value % 1 === 0) {// integer
-				value = this._base10To36(value);
+				value = _base10To36(value);
 			} else {// float
 
 			}
 
 			// If is number, "serialize" the value
-			value = type === 'number' ? this._base10To36(value) : this._encode(value);
+			value = type === 'number' ? _base10To36(value) : _encode(value);
 
 			// Retrieve the index of that value in the dictionary
-			var index = this._indexOf.call(dictionary[type], value);
+			var index = _indexOf.call(dictionary[type], value);
 
 			// If that value is not in the dictionary
 			if (index === -1) {
@@ -484,9 +490,9 @@ angular.module('jsonlzw', []).
 			// just return a 36-based representation of the index
 			return type === 'number' ? '+' + index : index;
 
-		},
+		};
 
-		_encode: function(str) {
+		var _encode = function(str) {
 			if ( typeof str !== 'string')
 				return str;
 
@@ -499,9 +505,9 @@ angular.module('jsonlzw', []).
 				'%' : '%25'
 				})[a]
 			});
-		},
+		};
 
-		_decode: function(str) {
+		var _decode = function(str) {
 			if ( typeof str !== 'string')
 				return str;
 
@@ -514,24 +520,32 @@ angular.module('jsonlzw', []).
 				'%25' : '%'
 				})[a]
 			})
-		},
+		};
 
-		_base10To36: function(number) {
+		var _base10To36 = function(number) {
 			return Number.prototype.toString.call(number, 36).toUpperCase();
-		},
+		};
 
-		_base36To10: function(number) {
+		var _base36To10 = function(number) {
 			return parseInt(number, 36);
-		},
+		};
 
-		_indexOf: Array.prototype.indexOf ||
-		function(obj, start) {
+		var _indexOf = Array.prototype.indexOf ||
+			function(obj, start) {
 			for (var i = (start || 0), j = this.length; i < j; i++) {
 				if (this[i] === obj) {
 					return i;
 				}
 			}
 			return -1;
-		}
-    
-  });
+		};
+
+		return {
+			decode: decode,
+			encode: encode,
+			pack: pack,
+			unpack: unpack
+		};
+	}
+
+})(angular);
